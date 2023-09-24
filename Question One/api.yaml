@@ -1,0 +1,198 @@
+openapi: 3.0.1
+info:
+  title: Faculty of Computing and Informatics API
+  version: 1.0.0
+  description: API for managing staff, offices, and courses in the Faculty of Computing and Informatics.
+servers:
+  - url: 'http://localhost:9090/dsa'
+paths:
+  /lecturers:
+    post:
+      summary: Add a new lecturer
+      operationId: addLecturer
+      tags:
+        - Lecturers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lecturer'
+      responses:
+        '201':
+          description: Lecturer added successfully
+        '400':
+          description: Bad request or invalid input
+    get:
+      summary: Retrieve a list of all lecturers within the faculty
+      operationId: getAllLecturers
+      tags:
+        - Lecturers
+      responses:
+        '200':
+          description: A list of lecturers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lecturer'
+        '404':
+          description: No lecturers found
+
+  /lecturers/{staffNumber}:
+    get:
+      summary: Retrieve details of a specific lecturer by their staff number
+      operationId: getLecturerByStaffNumber
+      tags:
+        - Lecturers
+      parameters:
+        - name: staffNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lecturer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lecturer'
+        '404':
+          description: Lecturer not found
+
+    put:
+      summary: Update an existing lecturer's information
+      operationId: updateLecturer
+      tags:
+        - Lecturers
+      parameters:
+        - name: staffNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lecturer'
+      responses:
+        '200':
+          description: Lecturer updated successfully
+        '404':
+          description: Lecturer not found
+
+    delete:
+      summary: Delete a lecturer's record by their staff number
+      operationId: deleteLecturer
+      tags:
+        - Lecturers
+      parameters:
+        - name: staffNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Lecturer deleted successfully
+        '404':
+          description: Lecturer not found
+
+  /lecturers/course/{courseCode}:
+    get:
+      summary: Retrieve all the lecturers that teach a certain course
+      operationId: getLecturersByCourse
+      tags:
+        - Lecturers
+      parameters:
+        - name: courseCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of lecturers teaching the specified course
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lecturer'
+        '404':
+          description: No lecturers found for the specified course
+
+  /lecturers/office/{officeNumber}:
+    get:
+      summary: Retrieve all the lecturers that sit in the same office
+      operationId: getLecturersByOffice
+      tags:
+        - Lecturers
+      parameters:
+        - name: officeNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of lecturers in the specified office
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lecturer'
+        '404':
+          description: No lecturers found for the specified office
+
+components:
+  schemas:
+    Course:
+      type: object
+      required:
+        - courseName
+        - courseCode
+        - NQFLevel
+      properties:
+        courseName:
+          type: string
+          description: Name of the course
+        courseCode:
+          type: string
+          description: Unique identifier for the course
+        NQFLevel:
+          type: integer
+          format: int32
+          description: NQF (National Qualifications Framework) level of the course
+
+    Lecturer:
+      type: object
+      required:
+        - staffNumber
+        - officeNumber
+        - staffName
+        - title
+        - courses
+      properties:
+        staffNumber:
+          type: string
+          description: Unique identifier for the lecturer
+        officeNumber:
+          type: string
+          description: Office number where the lecturer sits
+        staffName:
+          type: string
+          description: Full name of the lecturer
+        title:
+          type: string
+          description: Title or designation of the lecturer (e.g., Professor, Dr.)
+        courses:
+          type: array
+          description: List of courses that the lecturer teaches
+          items:
+            $ref: '#/components/schemas/Course'
